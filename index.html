@@ -1,0 +1,2549 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الموظفين</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <style>
+        * {
+            font-family: 'Tajawal', 'Cairo', sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #f3f4f6;
+        }
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* General Styles */
+        .title {
+            color: #1f2937;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            font-size: 1.875rem;
+            position: relative;
+            display: inline-block;
+        }
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 2px;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            transition: color 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            background-color: #fff;
+            outline: none;
+        }
+        .form-input:focus + .input-icon {
+            color: #3b82f6;
+        }
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            outline: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 6px 8px rgba(37, 99, 235, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.4);
+            transform: translateY(0);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+        }
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 6px 8px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-success:active {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.4);
+            transform: translateY(0);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-left: 0.5rem;
+        }
+        .btn.loading .loading-spinner {
+            display: block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .notification-box {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            pointer-events: none;
+            direction: rtl;
+        }
+        .notification-box.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .notification-box.success {
+            background-color: #10b981;
+        }
+        .notification-box.error {
+            background-color: #ef4444;
+        }
+        /* Login/Signup Page Styles */
+        #auth-page {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .form-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background-color: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+        .form-container {
+            width: 100%;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+        .form-container.visible-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 1;
+        }
+        .toggle-form, .forgot-password-link {
+            cursor: pointer;
+            color: #4b5563;
+            margin-top: 1rem;
+            display: block;
+            font-size: 0.875rem;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+        .toggle-form:hover, .forgot-password-link:hover {
+            color: #1a56db;
+        }
+        .heavy-equipment {
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #6b7280;
+            font-size: 2.5rem;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .logo-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+        .contact-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+        .contact-with-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .contact-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            margin-left: 1rem;
+            flex-shrink: 0;
+        }
+        .contact-icon-wrapper i {
+            font-size: 1.25rem;
+            color: #3b82f6;
+        }
+        .contact-numbers {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            gap: 0.25rem;
+        }
+        /* Dashboard Page Styles */
+        #dashboard-page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .dashboard-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #1f2937;
+            text-align: right;
+            position: relative;
+            animation: slideInFromRight 1s ease-out;
+            padding-right: 1.5rem;
+        }
+        .dashboard-title::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            bottom: -5px;
+            width: 50px;
+            height: 5px;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            border-radius: 2px;
+        }
+        .cards-grid {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            text-align: right;
+            direction: rtl;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+            transition: transform 0.3s ease;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        .card-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .card-button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .card-button:hover {
+            background-color: #2563eb;
+            transform: scale(1.05);
+        }
+        .details-section {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+        /* Updated details item styles */
+        .details-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #f0f4f8;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151;
+            border-right: 4px solid transparent;
+            border-image: linear-gradient(to bottom, #3b82f6, #1d4ed8) 1;
+            transition: all 0.3s ease;
+        }
+        .details-item:hover {
+            transform: translateX(-5px);
+            background-color: #e2e8f0;
+        }
+        .details-item span:first-child {
+            color: #64748b;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+        .details-item span:last-child {
+            color: #1f2937;
+            font-weight: 700;
+            text-align: left;
+        }
+        .document-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.75rem 1rem;
+            background-color: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #78350f;
+        }
+        .document-item.expired {
+            background-color: #fef2f2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+        .document-title {
+            font-weight: 700;
+        }
+        .document-date {
+            font-size: 0.8rem;
+        }
+        /* Back arrow button */
+        .back-arrow-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 50;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .back-arrow-btn:hover {
+            background-color: #d1d5db;
+            color: #374151;
+            transform: scale(1.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: slideIn 0.4s ease-out;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .modal-form .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .modal-form .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+        }
+        .modal-form .form-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .modal-form .modal-btn {
+            background-color: #10b981;
+            color: white;
+            padding: 1rem;
+            width: 100%;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+        .modal-form .modal-btn:hover {
+            background-color: #059669;
+        }
+        .logout-button {
+            background: none;
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .logout-button:hover {
+            background-color: #ef4444;
+            color: white;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideInFromRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            background-color: #f0f4f8;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .status-item:hover {
+            background-color: #e2e8f0;
+        }
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #334155;
+        }
+        .status-details {
+            display: none;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .status-details p {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .status-details.expanded {
+            display: block;
+        }
+        .status-text-notification {
+            font-size: 0.8rem;
+            color: #10b981;
+            font-weight: 500;
+        }
+        .status-text-message {
+            font-size: 0.9rem;
+            color: #334155;
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+        .delete-btn {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            border-radius: 1rem;
+            background-color: #fff;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        .message {
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            margin-bottom: 0.75rem;
+            word-wrap: break-word;
+        }
+        .my-message {
+            background-color: #3b82f6;
+            color: white;
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+        .other-message {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+        }
+        .chat-input button {
+            background-color: #3b82f6;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .chat-input button:hover {
+            background-color: #2563eb;
+        }
+        .salaries-list li {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            text-align: center;
+        }
+        .calendar-day {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .calendar-day:hover {
+            background-color: #e5e7eb;
+        }
+        .day-header {
+            font-weight: bold;
+            color: #4b5563;
+        }
+        .current-month {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+        .selected-range {
+            background-color: #93c5fd;
+            color: white;
+        }
+        .holiday {
+            background-color: #fca5a5;
+            color: #b91c1c;
+            text-decoration: line-through;
+            cursor: not-allowed;
+        }
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+            margin-bottom: 1.5rem;
+        }
+        .file-upload:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .file-upload i {
+            font-size: 2.5rem;
+            color: #9ca3af;
+        }
+        .file-upload p {
+            margin-top: 0.5rem;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        /* Swiper Styles */
+        .swiper-container {
+            width: 100%;
+            max-width: 800px;
+            height: 200px;
+            margin: 2rem 0;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .swiper-wrapper {
+            width: 100%;
+            height: 100%;
+        }
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 1.5rem;
+        }
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1.5rem;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #fff;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+        }
+        .swiper-button-next:after, .swiper-button-prev:after {
+            font-size: 1rem;
+        }
+        /* Mobile-friendly modal for leave request */
+        #leaveModal .modal-content {
+            width: 95%;
+            padding: 1.5rem;
+            margin: auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .toggle-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .details-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #f0f4f8;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151;
+            border-right: 4px solid transparent;
+            border-image: linear-gradient(to bottom, #3b82f6, #1d4ed8) 1;
+            transition: all 0.3s ease;
+        }
+        .details-item:hover {
+            transform: translateX(-5px);
+            background-color: #e2e8f0;
+        }
+        .details-item span:first-child {
+            color: #64748b;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+        .details-item span:last-child {
+            color: #1f2937;
+            font-weight: 700;
+            text-align: left;
+        }
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        .radio-group label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .radio-group input[type="radio"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .radio-group input[type="radio"]:checked {
+            border-color: #2563eb;
+        }
+        .radio-group input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: #2563eb;
+            border-radius: 50%;
+        }
+        /* New styles for the main dashboard layout */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 1rem;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .dashboard-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3b82f6;
+        }
+        /* Styles for the new supplies card and modal */
+        .supplies-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: #f8f8f8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .supplies-item:hover {
+            background-color: #e5e7eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        .supplies-item.selected {
+            background-color: #dbeafe;
+            border: 2px solid #3b82f6;
+        }
+        .supplies-item .item-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .supplies-item .item-details i {
+            font-size: 1.5rem;
+            color: #1d4ed8;
+        }
+        .supplies-item .item-details p {
+            font-weight: 600;
+        }
+        .pickup-time-slot {
+            padding: 0.75rem 1rem;
+            background-color: #eff6ff;
+            border: 2px solid #93c5fd;
+            border-radius: 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            color: #1e40af;
+            transition: background-color 0.3s ease;
+        }
+        .pickup-time-slot:hover {
+            background-color: #dbeafe;
+        }
+        .grid-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        /* Mobile adjustments for the main grid */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Page (Login/Signup) -->
+    <div id="auth-page" class="container">
+        <div class="form-wrapper">
+            <!-- Form containers -->
+            <div id="loginForm" class="form-container visible-form">
+                <h2 class="title">تسجيل الدخول</h2>
+                <!-- User Type Selection for Login -->
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="user-type-login" value="citizen" checked>
+                        مواطن
+                    </label>
+                    <label>
+                        <input type="radio" name="user-type-login" value="non-citizen">
+                        غير مواطن
+                    </label>
+                </div>
+                <form id="login-form" class="space-y-4">
+                    <div id="login-national-id-group" class="input-group">
+                        <input type="text" id="login-id-field" name="login-id-field" placeholder="الرقم الوطني" class="form-input">
+                        <div class="input-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="login-phone" name="login-phone" placeholder="رقم الهاتف" class="form-input">
+                        <div class="input-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="login-password" name="login-password" placeholder="كلمة المرور" class="form-input">
+                        <div class="input-icon toggle-password" data-target="login-password">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span>تسجيل الدخول</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                    <button type="button" id="fingerprintLoginBtn" class="btn btn-primary mt-2 flex items-center justify-center gap-2">
+                        <i class="fas fa-fingerprint"></i>
+                        <span>تسجيل الدخول بالبصمة</span>
+                    </button>
+                    <a href="#" class="forgot-password-link" onclick="handleForgotPassword(event)">
+                        هل نسيت كلمة المرور؟
+                    </a>
+                    <a href="#" class="toggle-form" onclick="toggleForms(event, 'signupForm')">
+                        إنشاء حساب جديد
+                    </a>
+                </form>
+                <div class="heavy-equipment">
+                    <i class="fas fa-truck-monster"></i>
+                </div>
+                <div class="contact-section">
+                    <div class="logo-container">
+                        <div class="logo-wrapper">
+                            <img src="https://i.postimg.cc/7LY3z7hB/Picsart-25-09-22-12-03-07-053.png" alt="شعار منصة المحاجر">
+                        </div>
+                    </div>
+                    <div class="contact-with-logo">
+                        <div class="contact-icon-wrapper">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="contact-numbers">
+                            <span>092-4421801</span>
+                            <span>091-3762493</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="signupForm" class="form-container">
+                <h2 class="title">إنشاء حساب</h2>
+                <!-- User Type Selection for Signup -->
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="user-type-signup" value="citizen" checked>
+                        مواطن
+                    </label>
+                    <label>
+                        <input type="radio" name="user-type-signup" value="non-citizen">
+                        غير مواطن
+                    </label>
+                </div>
+                <form id="signup-form" class="space-y-4">
+                    <div id="signup-name-group" class="input-group">
+                        <input type="text" id="signup-name" name="signup-name" placeholder="اسمك الثلاثي" class="form-input">
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div id="signup-id-group" class="input-group">
+                        <input type="text" id="signup-id-field" name="signup-id-field" placeholder="الرقم الوطني" class="form-input">
+                        <div class="input-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="signup-phone" name="signup-phone" placeholder="رقم الهاتف" class="form-input">
+                        <div class="input-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="signup-password" name="signup-password" placeholder="إنشاء كلمة مرور" class="form-input">
+                        <div class="input-icon toggle-password" data-target="signup-password">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <span>إنشاء حساب</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                    <a href="#" class="toggle-form" onclick="toggleForms(event, 'loginForm')">
+                        العودة إلى تسجيل الدخول
+                    </a>
+                </form>
+                <div class="heavy-equipment">
+                    <i class="fas fa-hard-hat"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="container">
+        <div class="dashboard-header w-full max-w-4xl">
+            <div class="dashboard-profile">
+                <img src="https://placehold.co/100x100/3b82f6/ffffff?text=User" alt="صورة الملف الشخصي" class="profile-pic">
+                <div>
+                    <h1 class="font-bold text-xl md:text-2xl text-gray-800" id="welcome-name"></h1>
+                    <p class="text-sm text-gray-500">مرحباً بك في تطبيق العامل</p>
+                </div>
+            </div>
+            <button id="logoutBtn" class="logout-button flex items-center gap-2 mt-4 md:mt-0">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </button>
+        </div>
+        <div id="announcement-slider" class="swiper-container w-full max-w-4xl mb-6">
+            <div class="swiper-wrapper">
+                <!-- Slides will be populated by JS -->
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+        <!-- تم نقل قسم التفاصيل ليظهر هنا عند الضغط على الزر -->
+        <div id="details-container" class="details-section w-full max-w-4xl bg-white p-6 rounded-2xl shadow-md mb-6" data-aos="zoom-in" data-aos-duration="500">
+             <button class="back-arrow-btn" onclick="hideDetails()">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <div class="details-item">
+                <span>الاسم:</span>
+                <span id="employee-name"></span>
+            </div>
+            <div class="details-item">
+                <span>الرقم الوطني:</span>
+                <span id="employee-national-id"></span>
+            </div>
+            <div class="details-item">
+                <span>رقم الهاتف:</span>
+                <span id="employee-phone"></span>
+            </div>
+            <div class="details-item">
+                <span>حالة العامل:</span>
+                <span id="employee-status"></span>
+            </div>
+            <div class="details-item">
+                <span>تاريخ الالتحاق:</span>
+                <span id="employee-join-date"></span>
+            </div>
+            <div class="details-item">
+                <span>ساعات الدوام الشهرية:</span>
+                <span id="employee-hours"></span>
+            </div>
+            <div class="details-item">
+                <span>الراتب الشهري (صافي):</span>
+                <span id="employee-salary"></span>
+            </div>
+            <div class="details-item">
+                <span>رخصة القيادة:</span>
+                <span id="employee-license"></span>
+            </div>
+            <div class="details-item">
+                <span>موقع العمل:</span>
+                <span id="employee-location"></span>
+            </div>
+            <!-- New Documents Section -->
+            <div class="mt-8">
+                <h3 class="card-title mb-4 border-b-2 border-blue-500 pb-2">المستندات الرسمية</h3>
+                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Documents will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="cards-grid w-full max-w-4xl">
+            <div id="employee-card" class="card shadow-md flex flex-col items-end mb-4 w-full" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-user-circle"></i>
+                <h2 class="card-title">معلومات العامل</h2>
+                <p class="card-text">اطلع على بياناتك الشخصية، سجل الحضور والانصراف، وتقرير الرواتب.</p>
+                <button id="show-details-btn" class="card-button">عرض التفاصيل</button>
+            </div>
+            <!-- New Fingerprint Toggle Card -->
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-fingerprint"></i>
+                <h3 class="card-title">إعدادات البصمة</h3>
+                <p class="card-text">قم بتفعيل أو تعطيل استخدام البصمة لتسجيل الدخول.</p>
+                <div class="flex items-center justify-between w-full mt-4">
+                    <span class="font-semibold text-gray-700">تفعيل البصمة</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="fingerprintToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <!-- Attendance Card -->
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-clock"></i>
+                <h3 class="card-title">الحضور والانصراف</h3>
+                <p class="card-text">سجل حضورك اليومي وانصرافك من موقع العمل المحدد.</p>
+                <button class="card-button" onclick="showModal('attendanceModal')">تسجيل الحضور</button>
+            </div>
+            <!-- New Supplies Request Card -->
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-tools"></i>
+                <h3 class="card-title">طلبات المستلزمات</h3>
+                <p class="card-text">قدم طلبًا لشراء أو استلام مستلزمات العمل مثل الخوذ أو القفازات.</p>
+                <button class="card-button" onclick="showModal('suppliesModal')">طلب مستلزمات</button>
+            </div>
+            <!-- New Performance Evaluation Card -->
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-medal"></i>
+                <h3 class="card-title">تقييم الأداء</h3>
+                <p class="card-text">اطلع على تقييم أدائك الشهري وملاحظات الإدارة.</p>
+                <button class="card-button" onclick="showModal('performanceModal')">عرض التقييم</button>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-tasks"></i>
+                <h3 class="card-title">نشاط العامل</h3>
+                <p class="card-text">تتبع مهامك اليومية ومشاريعك الحالية والمنجزة.</p>
+                <button class="card-button" onclick="showModal('activityModal')">عرض الأنشطة</button>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-clipboard-list"></i>
+                <h3 class="card-title">حالة الطلبات</h3>
+                <p class="card-text">تابع حالة طلبات الإجازات والشكاوى التي قدمتها.</p>
+                <button class="card-button" onclick="showModal('statusModal')">عرض الحالة</button>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-exclamation-triangle"></i>
+                <h3 class="card-title">الإبلاغ والشكاوى</h3>
+                <p class="card-text">أرسل شكوى أو بلاغًا عن أي مشكلة تواجهك في العمل.</p>
+                <button class="card-button" onclick="showModal('complaintModal')">إرسال شكوى</button>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-calendar-alt"></i>
+                <h3 class="card-title">طلب إجازة شهرية</h3>
+                <p class="card-text">قدم طلب إجازة رسمية وتابع حالته عبر النظام.</p>
+                <button class="card-button" onclick="showModal('leaveModal')">تقديم طلب</button>
+            </div>
+            <!-- New cards added here -->
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-file-invoice-dollar"></i>
+                <h3 class="card-title">كشوفات الرواتب</h3>
+                <p class="card-text">اطلع على كشوفات رواتبك الشهرية وقم بتحميلها.</p>
+                <button class="card-button" onclick="showModal('salaryModal')">عرض الكشوفات</button>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-duration="500">
+                <i class="card-icon fas fa-comments"></i>
+                <h3 class="card-title">المحادثة</h3>
+                <p class="card-text">تواصل مباشرة مع إدارة الموارد البشرية.</p>
+                <button class="card-button" onclick="showModal('chatModal')">ابدأ المحادثة</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modals -->
+    <div id="activityModal" class="modal">
+        <div class="modal-content">
+             <button class="back-arrow-btn" onclick="closeModal('activityModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">نشاط العامل</h2>
+            <div id="activity-list" class="text-right mt-4 text-gray-600">
+                <!-- Activity list will be populated by JS -->
+            </div>
+        </div>
+    </div>
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('statusModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">حالة الطلبات</h2>
+            <div id="status-list" class="text-right mt-4 text-gray-600">
+                <div class="text-center text-gray-500 my-4">لا توجد طلبات حالية.</div>
+            </div>
+        </div>
+    </div>
+    <div id="complaintModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('complaintModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">إرسال شكوى</h2>
+            <form id="complaint-form" class="modal-form">
+                <div class="input-group">
+                    <select id="complaint-type" class="form-input" required>
+                        <option value="" disabled selected>اختر نوع الشكوى</option>
+                        <option value="مشكلة فنية">مشكلة فنية</option>
+                        <option value="سوء سلوك">سوء سلوك</option>
+                        <option value="تأخر راتب">تأخر راتب</option>
+                        <option value="مشكلة أخرى">مشكلة أخرى</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="complaint-title" placeholder="عنوان الشكوى" class="form-input" required>
+                </div>
+                <div class="input-group">
+                    <textarea id="complaint-details" placeholder="أكتب تفاصيل الشكوى..." class="form-input h-32" required></textarea>
+                </div>
+                <div class="file-upload" onclick="document.getElementById('complaint-file-input').click();">
+                    <i class="fas fa-camera"></i>
+                    <p>إرفاق صورة للمشكلة (اختياري)</p>
+                    <input type="file" id="complaint-file-input" accept="image/*" class="hidden">
+                </div>
+                <button type="submit" class="modal-btn">إرسال</button>
+            </form>
+        </div>
+    </div>
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('leaveModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">طلب إجازة</h2>
+            <div id="leave-balance" class="text-right text-sm text-gray-600 mb-4">
+                الرصيد المتاح: <span id="available-leave-days" class="font-bold">14</span> يوم
+            </div>
+            <form id="leave-form" class="modal-form">
+                <div class="input-group">
+                    <input type="text" id="leave-type" placeholder="نوع الإجازة" class="form-input" required>
+                </div>
+                <div class="input-group">
+                    <input type="date" id="leave-start-date" class="form-input" required>
+                </div>
+                <div class="input-group">
+                    <input type="date" id="leave-end-date" class="form-input" required>
+                </div>
+                <div id="leave-days-count" class="text-center text-gray-500 mb-4">عدد الأيام المحددة: 0</div>
+                <div id="leave-calendar" class="calendar-container mb-4"></div>
+                <button type="submit" class="modal-btn">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+    <!-- New Modals -->
+    <div id="salaryModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('salaryModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">كشوفات الرواتب</h2>
+            <ul id="salaries-list" class="salaries-list text-right mt-4 text-gray-600">
+                <!-- Salary list will be populated by JS -->
+            </ul>
+        </div>
+    </div>
+    <div id="attendanceModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('attendanceModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">تسجيل الحضور</h2>
+            <div id="map-container" class="w-full h-64 my-4 rounded-lg shadow-inner"></div>
+            <div id="attendance-status" class="text-center text-lg font-bold my-4"></div>
+            <div id="attendance-methods" class="flex justify-around items-center mt-4 gap-4">
+                <button id="qrBtn" class="flex-1 btn btn-primary flex flex-col items-center justify-center p-4" onclick="handleQRCode()">
+                    <i class="fas fa-qrcode text-2xl"></i>
+                    <span class="mt-2 text-sm">رمز QR</span>
+                </button>
+                <button id="fingerprintBtn" class="flex-1 btn btn-primary flex flex-col items-center justify-center p-4" onclick="handleFingerprint()">
+                    <i class="fas fa-fingerprint text-2xl"></i>
+                    <span class="mt-2 text-sm">بصمة</span>
+                </button>
+            </div>
+            <button id="checkInBtn" class="btn btn-success mt-4 hidden">
+                <i class="fas fa-sign-in-alt ml-2"></i> تسجيل الحضور
+            </button>
+            <button id="checkOutBtn" class="btn btn-primary mt-4 hidden">
+                <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الانصراف
+            </button>
+        </div>
+    </div>
+    <div id="performanceModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('performanceModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">تقييم الأداء</h2>
+            <div id="performance-chart" class="w-full h-64 mb-4">
+                <canvas id="performanceChartCanvas"></canvas>
+            </div>
+            <div id="performance-details" class="text-right text-gray-700">
+                <!-- Performance details will be populated by JS -->
+            </div>
+        </div>
+    </div>
+    <div id="chatModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('chatModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">المحادثة مع الإدارة</h2>
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <!-- Chat messages will be populated by JS -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input-field" placeholder="اكتب رسالتك..." class="form-input" />
+                    <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- New Supplies Modal -->
+    <div id="suppliesModal" class="modal">
+        <div class="modal-content">
+            <button class="back-arrow-btn" onclick="closeModal('suppliesModal')">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="modal-title">طلب مستلزمات العمل</h2>
+            <div id="supplies-list" class="grid-row mb-4">
+                <!-- Supplies items will be populated by JS -->
+            </div>
+            <div id="pickup-info" class="hidden">
+                <h3 class="font-bold text-lg text-gray-700 mb-2">معلومات الاستلام</h3>
+                <p class="text-gray-600 mb-4">
+                    يمكنك استلام طلبك في الموعد المحدد من مستودع الشركة.
+                </p>
+                <div class="pickup-time-slot" id="pickup-slot">
+                    <!-- Pickup time will be set by JS -->
+                </div>
+            </div>
+            <button id="request-supplies-btn" class="modal-btn mt-4">
+                <i class="fas fa-paper-plane ml-2"></i> إرسال الطلب
+            </button>
+        </div>
+    </div>
+    <div id="notification" class="notification-box"></div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.1.0/dist/jsQR.js"></script>
+    <script>
+        // Data simulation
+        let requests = [];
+        let leaveBalance = 14;
+        const employeeData = {
+            name: "معمر جادالله حمد",
+            nationalId: "1199400051218",
+            phone: "0925513418",
+            status: "نشط",
+            joinDate: "01/01/2020",
+            monthlyHours: 200,
+            salary: 1000,
+            hasLicense: true,
+            location: "موقع رقم 3",
+            documents: [
+                { type: "جواز السفر", expiry: "2025-10-15" },
+                { type: "رخصة القيادة", expiry: "2026-03-20" },
+                { type: "عقد العمل", expiry: "2025-11-20" }
+            ]
+        };
+        const salaryData = [
+            { month: "ديسمبر 2024", amount: 1000, deductions: 200, bonuses: 0, file: "salary-dec-2024.pdf" },
+            { month: "نوفمبر 2024", amount: 1100, deductions: 50, bonuses: 100, file: "salary-nov-2024.pdf" },
+            { month: "أكتوبر 2024", amount: 1010, deductions: 0, bonuses: 0, file: "salary-oct-2024.pdf" },
+        ];
+        const announcements = [
+            { id: 1, title: "اجتماع طارئ حول السلامة", date: "25/12/2024", message: "سيُعقد اجتماع هام بخصوص إجراءات السلامة الجديدة يوم الأربعاء في تمام الساعة 10 صباحًا في غرفة الاجتماعات الرئيسية.", image: "https://placehold.co/800x400/1e40af/ffffff?text=Safety+Meeting" },
+            { id: 2, title: "تغيير في سياسة الحضور", date: "20/12/2024", message: "تحديث جديد في سياسة الحضور والانصراف، يرجى مراجعة البريد الإلكتروني للحصول على التفاصيل الكاملة.", image: "https://placehold.co/800x400/065f46/ffffff?text=Policy+Update" },
+            { id: 3, title: "برنامج تدريبي متقدم", date: "15/12/2024", message: "تعلن إدارة الكسارات عن إقامة برنامج تدريبي متقدمة 🏗️ في مجالات القيادة الاحترافية للشاحنات الثقيلة ⚙️ تشغيل وصيانة آليات الحفر والمعدات الثقيلة", image: "https://placehold.co/800x400/991b1b/ffffff?text=Advanced+Training" }
+        ];
+        // New supplies data
+        const suppliesData = [
+            { id: '1', name: 'خوذة أمان', icon: 'fas fa-hard-hat' },
+            { id: '2', name: 'قفازات عمل', icon: 'fas fa-gloves' },
+            { id: '3', name: 'زي عاكس', icon: 'fas fa-vest' },
+            { id: '4', name: 'نظارات واقية', icon: 'fas fa-glasses' },
+            { id: '5', name: 'حذاء أمان', icon: 'fas fa-shoe-prints' },
+            { id: '6', name: 'أدوات صيانة', icon: 'fas fa-tools' },
+        ];
+        let selectedSupply = null;
+        let chatMessages = [
+            { text: "مرحبًا، كيف يمكنني مساعدتك؟", sender: "other" },
+            { text: "لدي استفسار بخصوص الراتب الشهري.", sender: "my" },
+        ];
+        const holidays = ["2025-01-01", "2025-03-15"];
+        const workLocation = { lat: 32.1158, lng: 20.0988 };
+        const workLocationQR = "CRUSHER_SITE_2025";
+        
+        let fingerprintEnabled = localStorage.getItem('fingerprintEnabled') === 'true';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init();
+            gsap.utils.toArray(".card").forEach(card => {
+                gsap.set(card, { transformOrigin: "center center" });
+                card.addEventListener("mouseenter", () => {
+                    gsap.to(card, { duration: 0.3, scale: 1.02, ease: "power1.out", overwrite: "auto" });
+                });
+                card.addEventListener("mouseleave", () => {
+                    gsap.to(card, { duration: 0.3, scale: 1, ease: "power1.out", overwrite: "auto" });
+                });
+            });
+            const swiperWrapper = document.querySelector('.swiper-wrapper');
+            announcements.forEach(ann => {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide flex flex-col items-center justify-center p-6';
+                slide.innerHTML = `
+                    <h4 class="font-bold text-lg text-blue-800">${ann.title}</h4>
+                    <p class="text-sm text-gray-600 mt-2">${ann.message}</p>
+                    <p class="text-xs text-gray-400 mt-2">نُشر في: ${ann.date}</p>
+                `;
+                swiperWrapper.appendChild(slide);
+            });
+            const swiper = new Swiper('.swiper-container', {
+                direction: 'horizontal',
+                loop: true,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                grabCursor: true,
+                simulateTouch: true,
+            });
+            function toggleForms(event, formId) {
+                event.preventDefault();
+                const formContainers = document.querySelectorAll('.form-container');
+                formContainers.forEach(container => container.classList.remove('visible-form'));
+                document.getElementById(formId).classList.add('visible-form');
+            }
+            function showNotification(message, type) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification-box show ${type}`;
+                setTimeout(() => notification.classList.remove('show'), 5000);
+            }
+            function showPushNotification(title, message) {
+                if (Notification.permission === 'granted') {
+                    new Notification(title, { body: message });
+                } else {
+                    showNotification(`تنبيه: ${title} - ${message}`, 'success');
+                }
+            }
+            function validateForm(formId) {
+                const form = document.getElementById(formId);
+                const idInput = form.querySelector('[id*="-id-field"]');
+                const phoneInput = form.querySelector('[id*="-phone"]');
+                const passwordInput = form.querySelector('[id*="-password"]');
+                const nameInput = form.querySelector('[id*="-name"]');
+                const userType = document.querySelector('input[name="user-type-' + (formId === 'login-form' ? 'login' : 'signup') + '"]:checked').value;
+                
+                if (userType === 'citizen') {
+                    if (idInput && idInput.value.length !== 13) {
+                        showNotification('الرقم الوطني يجب أن يتكون من 13 رقمًا.', 'error');
+                        return false;
+                    }
+                } else { // non-citizen
+                    if (!idInput?.value || idInput.value.length === 0) {
+                        showNotification('يرجى إدخال رقم الإقامة.', 'error');
+                        return false;
+                    }
+                }
+                
+                if (phoneInput) {
+                    const phoneValue = phoneInput.value;
+                    const phoneRegex = /^0(91|92|93|94|95)\d{7}$/;
+                    if (!phoneRegex.test(phoneValue)) {
+                        showNotification('يرجى إدخال رقم هاتف ليبي صحيح (مثال: 091xxxxxxx).', 'error');
+                        return false;
+                    }
+                }
+                if (passwordInput && passwordInput.value.length < 8) {
+                    showNotification('يجب أن لا تقل كلمة المرور عن 8 أحرف.', 'error');
+                    return false;
+                }
+                if (!idInput?.value || !phoneInput?.value || !passwordInput?.value) {
+                    showNotification('يرجى ملء جميع الحقول المطلوبة.', 'error');
+                    return false;
+                }
+                if (userType === 'non-citizen' && formId === 'signup-form' && !nameInput.value) {
+                    showNotification('يرجى إدخال اسمك.', 'error');
+                    return false;
+                }
+                if (userType === 'citizen' && formId === 'signup-form' && !nameInput.value) {
+                    showNotification('يرجى إدخال اسمك الثلاثي.', 'error');
+                    return false;
+                }
+                return true;
+            }
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                const form = event.target;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+                if (form.id === 'login-form') {
+                    if (validateForm(form.id)) {
+                        const id = document.getElementById('login-id-field').value;
+                        const phone = document.getElementById('login-phone').value;
+                        const password = document.getElementById('login-password').value;
+                        const adminNationalId = '1199400051218';
+                        const adminPhone = '0925513418';
+                        const adminPassword = 'AD612612';
+                        
+                        // Check if the input credentials match the admin credentials
+                        if (id === adminNationalId && phone === adminPhone && password === adminPassword) {
+                            setTimeout(() => {
+                                document.getElementById('auth-page').style.display = 'none';
+                                document.getElementById('dashboard-page').style.display = 'flex';
+                                initializeDashboard();
+                                checkAutomaticAlerts();
+                                requestNotificationPermission();
+                                showNotification('مرحباً بك مجدداً، تم تسجيل الدخول بنجاح! هل ترغب في تفعيل البصمة للوصول السريع لجميع خدماتك؟', 'success');
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                showNotification('بيانات الدخول غير صحيحة.', 'error');
+                                submitBtn.classList.remove('loading');
+                                submitBtn.disabled = false;
+                                document.getElementById('loginForm').classList.add('shake');
+                                setTimeout(() => {
+                                    document.getElementById('loginForm').classList.remove('shake');
+                                }, 500);
+                            }, 1000);
+                        }
+                    } else {
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                    }
+                } else if (form.id === 'signup-form') {
+                    if (validateForm(form.id)) {
+                        setTimeout(() => {
+                            showNotification('تم إنشاء الحساب بنجاح!', 'success');
+                            submitBtn.classList.remove('loading');
+                            submitBtn.disabled = false;
+                        }, 2000);
+                    } else {
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                    }
+                } else if (form.id === 'complaint-form') {
+                    const type = document.getElementById('complaint-type').value;
+                    const title = document.getElementById('complaint-title').value;
+                    const details = document.getElementById('complaint-details').value;
+                    const file = document.getElementById('complaint-file-input').files[0];
+                    if (!title || !details || !type) {
+                        showNotification('يرجى ملء جميع الحقول المطلوبة.', 'error');
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    const newRequest = {
+                        id: `C-${Date.now()}`,
+                        type: 'complaint',
+                        isProblemReport: true,
+                        subtype: type,
+                        title: title,
+                        details: details,
+                        date: new Date().toLocaleDateString('ar-LY', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                        status: 'قيد المراجعة',
+                        file: file ? file.name : null,
+                        approvalSteps: ["المدير المباشر"],
+                        specialMessage: 'تمت مراجعة طلبك وتحديد نوع المشكلة وجاري العمل عليها. أحسنت لإبلاغك عليها.'
+                    };
+                    requests.push(newRequest);
+                    setTimeout(() => {
+                        showNotification('تم إرسال شكواك بنجاح!', 'success');
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        closeModal(form.closest('.modal').id);
+                        form.reset();
+                        setTimeout(() => {
+                            const updatedRequest = requests.find(req => req.id === newRequest.id);
+                            if (updatedRequest) {
+                                updatedRequest.status = 'تمت المراجعة وتحديد المشكلة وجاري العمل عليها';
+                                const statusModal = document.getElementById('statusModal');
+                                if (statusModal.style.display === 'flex') {
+                                    loadStatusData();
+                                }
+                            }
+                        }, 30000);
+                    }, 1000);
+                } else if (form.id === 'leave-form') {
+                    const existingLeaveRequest = requests.find(req => req.type === 'leave' && (req.status === 'قيد المراجعة' || req.status === 'تمت الموافقة'));
+                    if (existingLeaveRequest) {
+                        showNotification('لديك بالفعل طلب إجازة قيد المراجعة أو الموافقة عليه.', 'error');
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    const type = document.getElementById('leave-type').value;
+                    const startDate = document.getElementById('leave-start-date').value;
+                    const endDate = document.getElementById('leave-end-date').value;
+                    const leaveId = `L-${Date.now()}`;
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    if (diffDays > leaveBalance) {
+                        showNotification('أيام الإجازة المطلوبة تتجاوز رصيدك المتاح.', 'error');
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    const newRequest = {
+                        id: leaveId,
+                        type: 'leave',
+                        title: `طلب إجازة: ${type}`,
+                        details: `من تاريخ ${new Date(startDate).toLocaleDateString('ar-LY')} إلى ${new Date(endDate).toLocaleDateString('ar-LY')}`,
+                        date: new Date().toLocaleDateString('ar-LY', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                        status: 'قيد المراجعة',
+                        isApproved: false,
+                        leaveDays: diffDays,
+                        approvalSteps: ["المدير المباشر"]
+                    };
+                    requests.push(newRequest);
+                    setTimeout(() => {
+                        showNotification('تم إرسال طلبك بنجاح!', 'success');
+                        document.getElementById('available-leave-days').textContent = leaveBalance;
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        closeModal(form.closest('.modal').id);
+                        form.reset();
+                        const isApprovedSimulated = Math.random() > 0.5;
+                        setTimeout(() => {
+                            const leaveRequest = requests.find(req => req.id === leaveId);
+                            if (leaveRequest) {
+                                if (isApprovedSimulated) {
+                                    leaveRequest.status = 'تمت الموافقة';
+                                    leaveRequest.isApproved = true;
+                                    leaveBalance -= diffDays;
+                                    document.getElementById('available-leave-days').textContent = leaveBalance;
+                                    showPushNotification('تنبيه الإجازة', 'تمت الموافقة على طلب إجازتك بنجاح!');
+                                    setTimeout(() => {
+                                        requests = requests.filter(req => req.id !== leaveId);
+                                        const statusModal = document.getElementById('statusModal');
+                                        if (statusModal.style.display === 'flex') {
+                                            loadStatusData();
+                                        }
+                                    }, 60000);
+                                } else {
+                                    leaveRequest.status = 'تم الرفض';
+                                    leaveRequest.detailsMessage = 'تم رفض طلب إجازتك. يرجى التواصل مع الإدارة للاستفسار.';
+                                    leaveRequest.isApproved = false;
+                                    showPushNotification('تنبيه الإجازة', 'تم رفض طلب إجازتك. يرجى التواصل مع الإدارة.');
+                                }
+                                const statusModal = document.getElementById('statusModal');
+                                if (statusModal.style.display === 'flex') {
+                                    loadStatusData();
+                                }
+                            }
+                        }, 30000);
+                    }, 1000);
+                }
+            }
+            window.deleteRequest = (id) => {
+                const requestToDelete = requests.find(req => req.id === id);
+                if (requestToDelete && requestToDelete.status === 'تم الرفض') {
+                    requests = requests.filter(req => req.id !== id);
+                    showNotification('تم حذف الطلب بنجاح.', 'success');
+                    loadStatusData();
+                } else {
+                    showNotification('لا يمكن حذف هذا الطلب.', 'error');
+                }
+            };
+            function handleFingerprintLogin() {
+                if (!fingerprintEnabled) {
+                    showNotification('يجب تفعيل ميزة البصمة أولاً من لوحة التحكم.', 'error');
+                    return;
+                }
+                 if ('credentials' in navigator) {
+                    const publicKeyCredentialCreationOptions = {
+                        challenge: new Uint8Array(32),
+                        rp: { name: 'نظام إدارة الموظفين' },
+                        user: { id: new Uint8Array(16), name: 'user123', displayName: 'الموظف' },
+                        pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+                        authenticatorSelection: { authenticatorAttachment: 'platform' },
+                    };
+                    navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions })
+                        .then(() => {
+                             setTimeout(() => {
+                                document.getElementById('auth-page').style.display = 'none';
+                                document.getElementById('dashboard-page').style.display = 'flex';
+                                initializeDashboard();
+                                checkAutomaticAlerts();
+                                requestNotificationPermission();
+                                showNotification('مرحباً بك مجدداً، تم تسجيل الدخول بنجاح عبر البصمة! استمتع بالوصول السريع لجميع خدماتك.', 'success');
+                            }, 1000);
+                        })
+                        .catch(err => {
+                            showNotification('فشلت المصادقة ببصمة الإصبع.', 'error');
+                            document.getElementById('loginForm').classList.add('shake');
+                            setTimeout(() => {
+                                document.getElementById('loginForm').classList.remove('shake');
+                            }, 500);
+                            console.error(err);
+                        });
+                } else {
+                    showNotification('متصفحك لا يدعم بصمة الإصبع.', 'error');
+                }
+            }
+            function checkAutomaticAlerts() {
+                const today = new Date();
+                const contractExpiry = new Date(employeeData.documents.find(doc => doc.type === 'عقد العمل').expiry);
+                const salaryDay = 25;
+                if (today.getDate() >= salaryDay - 5 && today.getDate() <= salaryDay) {
+                    showNotification("تنبيه: سيتم استلام راتبك قريبًا. يرجى التحقق من كشف الراتب.", 'success');
+                    showPushNotification("تنبيه الراتب", "سيتم استلام راتبك قريبًا. يرجى التحقق من كشوفات الرواتب.");
+                }
+                employeeData.documents.forEach(doc => {
+                    const expiryDate = new Date(doc.expiry);
+                    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 30 && diffDays > 0) {
+                        showNotification(`تنبيه: صلاحية ${doc.type} ستنتهي خلال ${diffDays} يومًا. يرجى تجديدها.`, 'error');
+                        showPushNotification(`تنبيه انتهاء ${doc.type}`, `صلاحية ${doc.type} ستنتهي خلال ${diffDays} يومًا. يرجى تجديدها.`);
+                    } else if (diffDays <= 0) {
+                        showNotification(`تنبيه: صلاحية ${doc.type} قد انتهت. يرجى تجديدها فورًا.`, 'error');
+                        showPushNotification(`تنبيه انتهاء ${doc.type}`, `صلاحية ${doc.type} قد انتهت. يرجى تجديدها فورًا.`);
+                    }
+                });
+            }
+            function requestNotificationPermission() {
+                if ('Notification' in window) {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            showNotification('تم السماح بالإشعارات بنجاح.', 'success');
+                        } else {
+                            showNotification('تم رفض إذن الإشعارات.', 'error');
+                        }
+                    });
+                }
+            }
+            // وظيفة للتعامل مع رابط "نسيت كلمة المرور"
+            window.handleForgotPassword = (event) => {
+                event.preventDefault();
+                showNotification('يرجى التواصل مع الإدارة لإعادة تعيين كلمة المرور.', 'error');
+            };
+
+            document.getElementById('login-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('signup-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('complaint-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('leave-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('fingerprintLoginBtn').addEventListener('click', handleFingerprintLogin);
+            document.querySelectorAll('.toggle-form').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const formId = e.target.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    toggleForms(e, formId);
+                });
+            });
+            document.querySelectorAll('.toggle-password').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const targetId = icon.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.querySelector('i').classList.replace('fa-eye', 'fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.querySelector('i').classList.replace('fa-eye-slash', 'fa-eye');
+                    }
+                });
+            });
+
+            // Handle user type selection for Login
+            document.querySelectorAll('input[name="user-type-login"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const idInput = document.getElementById('login-id-field');
+                    const idGroup = document.getElementById('login-national-id-group');
+                    if (e.target.value === 'citizen') {
+                        idInput.placeholder = 'الرقم الوطني';
+                        idGroup.querySelector('.input-icon i').className = 'fas fa-id-card';
+                    } else {
+                        idInput.placeholder = 'رقم الإقامة';
+                        idGroup.querySelector('.input-icon i').className = 'fas fa-passport';
+                    }
+                });
+            });
+            // Handle user type selection for Signup
+            document.querySelectorAll('input[name="user-type-signup"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const idInput = document.getElementById('signup-id-field');
+                    const idGroup = document.getElementById('signup-id-group');
+                    const nameInput = document.getElementById('signup-name');
+                    const nameGroup = document.getElementById('signup-name-group');
+                    if (e.target.value === 'citizen') {
+                        idInput.placeholder = 'الرقم الوطني';
+                        idGroup.querySelector('.input-icon i').className = 'fas fa-id-card';
+                        nameInput.placeholder = 'اسمك الثلاثي';
+                    } else {
+                        idInput.placeholder = 'رقم الإقامة';
+                        idGroup.querySelector('.input-icon i').className = 'fas fa-passport';
+                        nameInput.placeholder = 'اسمك';
+                    }
+                });
+            });
+
+            function initializeDashboard() {
+                const formatNumber = (num) => new Intl.NumberFormat('ar-LY').format(num);
+                document.getElementById('employee-name').textContent = employeeData.name;
+                document.getElementById('welcome-name').textContent = `أهلاً ${employeeData.name.split(' ')[0]}!`;
+                document.getElementById('employee-national-id').textContent = employeeData.nationalId;
+                document.getElementById('employee-phone').textContent = employeeData.phone;
+                document.getElementById('employee-status').textContent = employeeData.status;
+                document.getElementById('employee-join-date').textContent = employeeData.joinDate;
+                document.getElementById('employee-hours').textContent = `${formatNumber(employeeData.monthlyHours)} ساعة`;
+                document.getElementById('employee-salary').textContent = `${formatNumber(employeeData.salary)} د.ل`;
+                document.getElementById('employee-license').textContent = employeeData.hasLicense ? "نعم" : "لا";
+                document.getElementById('employee-location').textContent = employeeData.location;
+                document.getElementById('available-leave-days').textContent = leaveBalance;
+                
+                // Set initial state of the fingerprint toggle
+                document.getElementById('fingerprintToggle').checked = fingerprintEnabled;
+                document.getElementById('fingerprintToggle').addEventListener('change', (event) => {
+                    fingerprintEnabled = event.target.checked;
+                    localStorage.setItem('fingerprintEnabled', fingerprintEnabled);
+                    showNotification(`تم ${fingerprintEnabled ? 'تفعيل' : 'تعطيل'} بصمة الإصبع.`, 'success');
+                });
+
+                loadDocuments();
+                document.getElementById('show-details-btn').addEventListener('click', () => {
+                    const detailsContainer = document.getElementById('details-container');
+                    const btn = document.getElementById('show-details-btn');
+                    if (detailsContainer.classList.contains('active')) {
+                        hideDetails();
+                    } else {
+                        detailsContainer.style.display = 'flex';
+                        detailsContainer.classList.add('active');
+                        btn.textContent = 'إخفاء التفاصيل';
+                        // استخدام GSAP لتأثيرات العرض
+                        gsap.fromTo(detailsContainer,
+                            { height: 0, paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, opacity: 0 },
+                            { height: "auto", paddingTop: '2rem', paddingBottom: '2rem', marginTop: '1.5rem', marginBottom: '1.5rem', opacity: 1, duration: 0.5, ease: "power2.inOut" }
+                        );
+                    }
+                });
+            }
+            function loadDocuments() {
+                const documentsList = document.getElementById('documents-list');
+                documentsList.innerHTML = '';
+                const today = new Date();
+                employeeData.documents.forEach(doc => {
+                    const expiryDate = new Date(doc.expiry);
+                    const isExpired = expiryDate < today;
+                    const docDiv = document.createElement('div');
+                    docDiv.className = `document-item flex-col items-start text-right ${isExpired ? 'expired' : ''}`;
+                    docDiv.innerHTML = `
+                        <div class="flex items-center justify-between w-full">
+                            <span class="document-title">${doc.type}</span>
+                            <i class="fas ${isExpired ? 'fa-exclamation-circle text-red-500' : 'fa-check-circle text-green-500'}"></i>
+                        </div>
+                        <span class="document-date text-sm mt-1">تاريخ انتهاء الصلاحية: ${doc.expiry}</span>
+                        ${isExpired ? '<span class="text-sm font-bold text-red-700 mt-1">منتهية الصلاحية</span>' : ''}
+                    `;
+                    documentsList.appendChild(docDiv);
+                });
+            }
+            window.hideDetails = () => {
+                const detailsContainer = document.getElementById('details-container');
+                const btn = document.getElementById('show-details-btn');
+                 // استخدام GSAP لتأثيرات الإخفاء
+                 gsap.to(detailsContainer, {
+                    height: 0,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        detailsContainer.style.display = 'none';
+                        btn.textContent = 'عرض التفاصيل';
+                        detailsContainer.classList.remove('active');
+                    }
+                });
+            };
+            window.showModal = (id) => {
+                const modal = document.getElementById(id);
+                modal.style.display = 'flex';
+                if (id === 'activityModal') {
+                    loadActivityData();
+                }
+                if (id === 'statusModal') {
+                    loadStatusData();
+                }
+                if (id === 'salaryModal') {
+                    loadSalaryData();
+                }
+                if (id === 'performanceModal') {
+                    loadPerformanceData();
+                }
+                if (id === 'chatModal') {
+                    loadChatMessages();
+                }
+                if (id === 'leaveModal') {
+                    renderCalendar();
+                }
+                if (id === 'attendanceModal') {
+                    initializeMap();
+                }
+                if (id === 'suppliesModal') {
+                    loadSuppliesData();
+                }
+            };
+            window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+            document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                document.getElementById('dashboard-page').style.display = 'none';
+                document.getElementById('auth-page').style.display = 'flex';
+                // إخفاء قسم التفاصيل عند تسجيل الخروج
+                document.getElementById('details-container').style.display = 'none';
+                document.getElementById('show-details-btn').textContent = 'عرض التفاصيل';
+                window.location.reload();
+            });
+            document.getElementById('send-chat-btn')?.addEventListener('click', () => {
+                const input = document.getElementById('chat-input-field');
+                const messageText = input.value.trim();
+                if (messageText) {
+                    chatMessages.unshift({ text: messageText, sender: "my" });
+                    loadChatMessages();
+                    input.value = '';
+                    setTimeout(() => {
+                        chatMessages.unshift({ text: "شكراً على رسالتك، سيتم الرد عليك في أقرب وقت ممكن.", sender: "other" });
+                        loadChatMessages();
+                    }, 2000);
+                }
+            });
+            document.getElementById('chat-input-field')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('send-chat-btn').click();
+                }
+            });
+            document.getElementById('complaint-file-input')?.addEventListener('change', (e) => {
+                const fileName = e.target.files[0]?.name || 'إرفاق صورة للمشكلة (اختياري)';
+                document.querySelector('.file-upload p').textContent = fileName;
+            });
+            function loadActivityData() {
+                const activityList = document.getElementById('activity-list');
+                activityList.innerHTML = `<div class="text-center text-gray-500 my-4">جاري تحميل البيانات...</div>`;
+                const mockActivities = [
+                    { title: "مكلف بمهمة قيادة الشاحنة رقم 7 في حقل الكسارة", date: "2025/09/25", status: "مكتمل", icon: "fas fa-check-circle text-green-500" },
+                    { title: "مهمة إعداد تقرير الحضور الأسبوعي", date: "2025/09/24", status: "قيد المراجعة", icon: "fas fa-hourglass-half text-yellow-500" },
+                    { title: "مكلف بأعمال الصيانة الدورية للمعدات الثقيلة", date: "2025/09/23", status: "مكتمل", icon: "fas fa-check-circle text-green-500" },
+                    { title: "مهمة حفر في الموقع رقم 3", date: "2025/09/22", status: "مكتمل", icon: "fas fa-check-circle text-green-500" },
+                ];
+                setTimeout(() => {
+                    activityList.innerHTML = '';
+                    mockActivities.forEach(activity => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center justify-between p-4 mb-3 bg-gray-100 rounded-lg shadow-sm';
+                        div.innerHTML = `
+                            <div class="flex items-center">
+                                <i class="${activity.icon} ml-3 text-lg"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">${activity.title}</h4>
+                                    <p class="text-sm text-gray-500">${activity.date}</p>
+                                </div>
+                            </div>
+                            <span class="text-sm font-semibold">${activity.status}</span>
+                        `;
+                        activityList.appendChild(div);
+                    });
+                }, 1500);
+            }
+            function loadStatusData() {
+                const statusList = document.getElementById('status-list');
+                statusList.innerHTML = '';
+                if (requests.length === 0) {
+                    statusList.innerHTML = '<div class="text-center text-gray-500 my-4">لا توجد طلبات حالية.</div>';
+                    return;
+                }
+                requests.forEach((req, index) => {
+                    const statusItem = document.createElement('div');
+                    statusItem.className = 'status-item mb-4';
+                    let statusColor = '';
+                    let statusText = '';
+                    if (req.isProblemReport) {
+                        statusText = req.status;
+                        statusColor = req.status === 'قيد المراجعة' ? 'text-yellow-600' : 'text-green-600';
+                    } else if (req.status === 'قيد المراجعة') {
+                        statusColor = 'text-yellow-600';
+                        statusText = 'قيد المراجعة';
+                    } else if (req.status === 'تمت الموافقة') {
+                        statusColor = 'text-green-600';
+                        statusText = 'تمت الموافقة';
+                    } else if (req.status === 'تم الرفض') {
+                        statusColor = 'text-red-600';
+                        statusText = 'تم الرفض';
+                    } else if (req.type === 'supplies' && req.status === 'تمت الموافقة') {
+                        statusColor = 'text-green-600';
+                        statusText = 'جاهز للاستلام';
+                    }
+                    else {
+                        statusColor = 'text-blue-600';
+                        statusText = req.status;
+                    }
+                    let approvalPathHTML = '';
+                    if (req.approvalSteps && req.approvalSteps.length > 0) {
+                        approvalPathHTML = '<div class="mt-2 text-sm">';
+                        req.approvalSteps.forEach((step, i) => {
+                            const isApproved = req.status === 'تمت الموافقة' || req.status === 'تمت المراجعة وتحديد المشكلة وجاري العمل عليها';
+                            const stepStatus = isApproved ? 'تمت الموافقة' : 'في انتظار';
+                            const stepColor = isApproved ? 'text-green-600' : 'text-yellow-600';
+                            approvalPathHTML += `<p class="my-1">
+                                <i class="fas fa-arrow-left ${isApproved ? 'text-green-500' : 'text-yellow-500'}"></i>
+                                <span>${i + 1}.</span>
+                                <span class="font-bold">${step}:</span>
+                                <span class="${stepColor}">${stepStatus}</span>
+                            </p>`;
+                        });
+                        approvalPathHTML += '</div>';
+                    }
+                    let deleteBtn = '';
+                    if (req.status === 'تم الرفض') {
+                        deleteBtn = `<button class="delete-btn" onclick="deleteRequest('${req.id}')">حذف الطلب</button>`;
+                    }
+                    let suppliesDetails = '';
+                    if (req.type === 'supplies') {
+                        suppliesDetails = `<p>المنتج المطلوب: <span class="font-bold">${req.item}</span></p>`;
+                        if (req.pickupTime) {
+                            suppliesDetails += `<p class="mt-2">موعد الاستلام: <span class="font-bold text-green-600">${req.pickupTime}</span></p>`;
+                        }
+                    }
+
+                    statusItem.innerHTML = `
+                        <div class="status-header">
+                            <span>${req.title}</span>
+                            <span class="text-sm text-gray-500">${req.date}</span>
+                        </div>
+                        <div class="status-details">
+                            <p>${req.details}</p>
+                            ${suppliesDetails}
+                            <p class="font-bold mt-2">الحالة: <span class="${statusColor}">${statusText}</span></p>
+                            ${req.isApproved && req.type === 'leave' ? `<p class="font-bold mt-2">رصيد الإجازة المتبقي: <span class="text-green-600">${leaveBalance} أيام</span></p>` : ''}
+                            ${approvalPathHTML}
+                            ${req.isProblemReport && req.status !== 'قيد المراجعة' ? `<p class="status-text-notification">تمت مراجعة طلبك وتحديد نوع المشكلة وجاري العمل عليها. أحسنت لإبلاغك عليها.</p>` : ''}
+                            ${deleteBtn}
+                        </div>
+                    `;
+                    statusItem.addEventListener('click', () => {
+                        const detailsDiv = statusItem.querySelector('.status-details');
+                        detailsDiv.classList.toggle('expanded');
+                    });
+                    statusList.appendChild(statusItem);
+                });
+            }
+            function loadSalaryData() {
+                const salariesList = document.getElementById('salaries-list');
+                salariesList.innerHTML = `<div class="text-center text-gray-500 my-4">جاري تحميل البيانات...</div>`;
+                setTimeout(() => {
+                    salariesList.innerHTML = '';
+                    if (salaryData.length === 0) {
+                        salariesList.innerHTML = '<div class="text-center text-gray-500 my-4">لا توجد كشوفات رواتب متاحة.</div>';
+                        return;
+                    }
+                    salaryData.forEach(salary => {
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center justify-between p-4 mb-3 bg-gray-100 rounded-lg shadow-sm';
+                        li.innerHTML = `
+                            <div>
+                                <h4 class="font-bold text-gray-800">${salary.month}</h4>
+                                <p class="text-sm text-gray-500">الصافي: ${new Intl.NumberFormat('ar-LY').format(salary.amount)} د.ل</p>
+                                <p class="text-sm text-red-500">الخصومات: ${new Intl.NumberFormat('ar-LY').format(salary.deductions)} د.ل</p>
+                                <p class="text-sm text-green-500">المكافآت: ${new Intl.NumberFormat('ar-LY').format(salary.bonuses)} د.ل</p>
+                            </div>
+                            <a href="#" class="text-blue-500 hover:text-blue-700" onclick="showNotification('جارِ تحميل ملف ${salary.file}', 'success')">
+                                <i class="fas fa-download ml-2"></i> تحميل
+                            </a>
+                        `;
+                        salariesList.appendChild(li);
+                    });
+                }, 1500);
+            }
+            function loadPerformanceData() {
+                const performanceDetails = document.getElementById('performance-details');
+                performanceDetails.innerHTML = `<div class="text-center text-gray-500 my-4">جاري تحميل البيانات...</div>`;
+                const performanceScores = [85, 90, 78, 88, 92];
+                const performanceMonths = ["يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر"];
+                const performanceComment = "أداء ممتاز في مهام الصيانة الوقائية، يرجى الاستمرار في تحسين مهارات إدارة الوقت.";
+                const averageScore = performanceScores.reduce((a, b) => a + b, 0) / performanceScores.length;
+                setTimeout(() => {
+                    const ctx = document.getElementById('performanceChartCanvas').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: performanceMonths,
+                            datasets: [{
+                                label: 'تقييم الأداء',
+                                data: performanceScores,
+                                borderColor: 'rgb(59, 130, 246)',
+                                tension: 0.1,
+                                fill: true,
+                                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'مخطط تقييم الأداء الشهري'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    title: {
+                                        display: true,
+                                        text: 'النقاط'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    performanceDetails.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-gray-500">متوسط التقييم:</span>
+                            <span class="font-bold text-lg text-blue-600">${averageScore.toFixed(1)}</span>
+                        </div>
+                        <p class="font-bold text-gray-500 mb-1">ملاحظات الإدارة:</p>
+                        <p class="text-sm italic">${performanceComment}</p>
+                    `;
+                }, 500);
+            }
+            function loadChatMessages() {
+                const chatBox = document.getElementById('chat-messages');
+                chatBox.innerHTML = '';
+                chatMessages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${msg.sender === 'my' ? 'my-message' : 'other-message'}`;
+                    msgDiv.textContent = msg.text;
+                    chatBox.appendChild(msgDiv);
+                });
+            }
+            let selectedStartDate = null;
+            let selectedEndDate = null;
+            function renderCalendar() {
+                const calendarContainer = document.getElementById('leave-calendar');
+                calendarContainer.innerHTML = '';
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const dayNames = ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+                dayNames.forEach(name => {
+                    const header = document.createElement('div');
+                    header.className = 'day-header';
+                    header.textContent = name;
+                    calendarContainer.appendChild(header);
+                });
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    const emptyDiv = document.createElement('div');
+                    calendarContainer.appendChild(emptyDiv);
+                }
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'calendar-day';
+                    dayDiv.textContent = day;
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    dayDiv.dataset.date = dateStr;
+                    if (holidays.includes(dateStr)) {
+                        dayDiv.classList.add('holiday');
+                    }
+                    dayDiv.addEventListener('click', () => handleDayClick(dayDiv, dateStr));
+                    calendarContainer.appendChild(dayDiv);
+                }
+            }
+            function handleDayClick(element, dateStr) {
+                if (element.classList.contains('holiday')) return;
+                if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                    document.querySelectorAll('.calendar-day').forEach(d => {
+                        d.classList.remove('selected-range', 'current-month');
+                    });
+                    selectedStartDate = dateStr;
+                    selectedEndDate = null;
+                    element.classList.add('selected-range');
+                    document.getElementById('leave-start-date').value = dateStr;
+                    document.getElementById('leave-end-date').value = '';
+                } else {
+                    selectedEndDate = dateStr;
+                    document.getElementById('leave-end-date').value = dateStr;
+                    const start = new Date(selectedStartDate);
+                    const end = new Date(selectedEndDate);
+                    if (start > end) {
+                        [selectedStartDate, selectedEndDate] = [selectedEndDate, selectedStartDate];
+                    }
+                    highlightDateRange();
+                }
+                updateLeaveDaysCount();
+            }
+            function highlightDateRange() {
+                const start = new Date(selectedStartDate);
+                const end = new Date(selectedEndDate);
+                document.querySelectorAll('.calendar-day').forEach(d => {
+                    const date = new Date(d.dataset.date);
+                    if (date >= start && date <= end && !d.classList.contains('holiday')) {
+                        d.classList.add('selected-range');
+                    }
+                });
+            }
+            function updateLeaveDaysCount() {
+                if (selectedStartDate && selectedEndDate) {
+                    const start = new Date(selectedStartDate);
+                    const end = new Date(selectedEndDate);
+                    let count = 0;
+                    let currentDate = new Date(start);
+                    while (currentDate <= end) {
+                        const dateStr = currentDate.toISOString().slice(0, 10);
+                        if (!holidays.includes(dateStr)) {
+                            count++;
+                        }
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                    document.getElementById('leave-days-count').textContent = `عدد أيام الإجازة: ${count}`;
+                } else {
+                    document.getElementById('leave-days-count').textContent = `عدد أيام الإجازة: 0`;
+                }
+            }
+            document.getElementById('leave-start-date')?.addEventListener('change', (e) => {
+                selectedStartDate = e.target.value;
+                if (selectedEndDate) highlightDateRange();
+            });
+            document.getElementById('leave-end-date')?.addEventListener('change', (e) => {
+                selectedEndDate = e.target.value;
+                highlightDateRange();
+            });
+            function initializeMap() {
+                const mapContainer = document.getElementById('map-container');
+                mapContainer.innerHTML = 'جاري تحميل الخريطة...';
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        const userLocation = { lat: userLat, lng: userLng };
+                        const distance = getDistance(userLocation, workLocation);
+                        const radiusInMeters = 50;
+                        let statusText = '';
+                        if (distance <= radiusInMeters) {
+                            statusText = `أنت داخل موقع العمل. المسافة: ${distance.toFixed(2)} متر.`;
+                            document.getElementById('checkInBtn').classList.remove('hidden');
+                        } else {
+                            statusText = `أنت خارج موقع العمل. المسافة: ${distance.toFixed(2)} متر.`;
+                            document.getElementById('checkInBtn').classList.add('hidden');
+                        }
+                        document.getElementById('attendance-status').textContent = statusText;
+                        const mapUrl = `https://maps.google.com/maps?q=${workLocation.lat},${workLocation.lng}&z=15&output=embed`;
+                        mapContainer.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border:0" src="${mapUrl}" allowfullscreen></iframe>`;
+                    }, () => {
+                        showNotification('لا يمكن الوصول إلى موقعك. يرجى تفعيل الموقع.', 'error');
+                        mapContainer.innerHTML = 'تعذر الوصول إلى الموقع.';
+                        document.getElementById('attendance-status').textContent = 'تعذر تحديد الموقع الجغرافي.';
+                    });
+                } else {
+                    showNotification('متصفحك لا يدعم تحديد الموقع الجغرافي.', 'error');
+                    mapContainer.innerHTML = 'تحديد الموقع غير مدعوم.';
+                    document.getElementById('attendance-status').textContent = 'متصفحك لا يدعم تحديد الموقع الجغرافي.';
+                }
+            }
+            function getDistance(coord1, coord2) {
+                const toRad = (x) => x * Math.PI / 180;
+                const R = 6371e3;
+                const dLat = toRad(coord2.lat - coord1.lat);
+                const dLon = toRad(coord2.lng - coord1.lng);
+                const lat1 = toRad(coord1.lat);
+                const lat2 = toRad(coord2.lat);
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                          Math.cos(lat1) * Math.cos(lat2) *
+                          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            }
+            window.handleQRCode = () => {
+                document.getElementById('attendance-status').textContent = 'جاري مسح رمز الاستجابة السريعة...';
+                const video = document.createElement('video');
+                const canvas = document.createElement('canvas');
+                const videoContainer = document.getElementById('map-container');
+                videoContainer.innerHTML = '';
+                videoContainer.appendChild(video);
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then((stream) => {
+                    video.srcObject = stream;
+                    video.play();
+                    function tick() {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            canvas.height = video.videoHeight;
+                            canvas.width = video.videoWidth;
+                            const context = canvas.getContext('2d');
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+                            if (code) {
+                                stream.getTracks().forEach(track => track.stop());
+                                if (code.data === workLocationQR) {
+                                    showNotification('تم مسح الرمز بنجاح!', 'success');
+                                    document.getElementById('attendance-status').textContent = 'تم تحديد الموقع عبر رمز الاستجابة السريعة.';
+                                    document.getElementById('checkInBtn').classList.remove('hidden');
+                                } else {
+                                    showNotification('رمز غير صالح.', 'error');
+                                    document.getElementById('attendance-status').textContent = 'رمز الاستجابة السريعة غير صالح.';
+                                }
+                                return;
+                            }
+                        }
+                        requestAnimationFrame(tick);
+                    }
+                    requestAnimationFrame(tick);
+                }).catch(err => {
+                    showNotification('لا يمكن الوصول إلى الكاميرا.', 'error');
+                    document.getElementById('attendance-status').textContent = 'تعذر الوصول إلى الكاميرا.';
+                });
+            };
+            window.handleFingerprint = () => {
+                if (!fingerprintEnabled) {
+                    showNotification('يجب تفعيل ميزة البصمة أولاً من لوحة التحكم.', 'error');
+                    return;
+                }
+                if ('credentials' in navigator) {
+                    const publicKeyCredentialCreationOptions = {
+                        challenge: new Uint8Array(32),
+                        rp: { name: 'نظام إدارة الموظفين' },
+                        user: { id: new Uint8Array(16), name: 'user123', displayName: 'الموظف' },
+                        pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+                        authenticatorSelection: { authenticatorAttachment: 'platform' },
+                    };
+                    navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions })
+                        .then(() => {
+                            showNotification('تمت المصادقة ببصمة الإصبع بنجاح!', 'success');
+                            document.getElementById('attendance-status').textContent = 'تم تسجيل الحضور باستخدام بصمة الإصبع.';
+                            document.getElementById('checkInBtn').classList.remove('hidden');
+                        })
+                        .catch(err => {
+                            showNotification('فشلت المصادقة ببصمة الإصبع.', 'error');
+                            document.getElementById('attendance-status').textContent = 'فشلت المصادقة ببصمة الإصبع.';
+                            console.error(err);
+                        });
+                } else {
+                    showNotification('متصفحك لا يدعم بصمة الإصبع.', 'error');
+                }
+            };
+            document.getElementById('checkInBtn')?.addEventListener('click', () => {
+                showNotification('تم تسجيل الحضور بنجاح!', 'success');
+                document.getElementById('checkInBtn').classList.add('hidden');
+                document.getElementById('checkOutBtn').classList.remove('hidden');
+            });
+            document.getElementById('checkOutBtn')?.addEventListener('click', () => {
+                showNotification('تم تسجيل الانصراف بنجاح!', 'success');
+                document.getElementById('checkOutBtn').classList.add('hidden');
+                document.getElementById('checkInBtn').classList.remove('hidden');
+            });
+            function scheduleReminders() {
+                const now = new Date();
+                const startHour = 8;
+                const endHour = 16;
+                const currentHour = now.getHours();
+                if (currentHour === startHour - 1 || currentHour === startHour) {
+                    showNotification("تذكير: يرجى تسجيل حضورك الآن.", 'success');
+                    showPushNotification("تذكير الحضور", "يرجى تسجيل حضورك الآن.");
+                }
+                if (currentHour === endHour - 1 || currentHour === endHour) {
+                    showNotification("تذكير: يرجى تسجيل انصرافك.", 'success');
+                    showPushNotification("تذكير الانصراف", "يرجى تسجيل انصرافك.");
+                }
+            }
+            setInterval(scheduleReminders, 3600000);
+            
+            function loadSuppliesData() {
+                const suppliesList = document.getElementById('supplies-list');
+                suppliesList.innerHTML = '';
+                suppliesData.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'supplies-item';
+                    itemDiv.innerHTML = `
+                        <div class="item-details">
+                            <i class="${item.icon}"></i>
+                            <p>${item.name}</p>
+                        </div>
+                    `;
+                    itemDiv.addEventListener('click', () => {
+                        document.querySelectorAll('.supplies-item').forEach(el => el.classList.remove('selected'));
+                        itemDiv.classList.add('selected');
+                        selectedSupply = item.name;
+                        const pickupSlotDiv = document.getElementById('pickup-slot');
+                        const pickupInfoDiv = document.getElementById('pickup-info');
+                        const today = new Date();
+                        today.setDate(today.getDate() + 1);
+                        const pickupDate = today.toLocaleDateString('ar-LY', { weekday: 'long', day: 'numeric', month: 'long' });
+                        const pickupTime = `10:00 صباحاً`;
+                        pickupSlotDiv.textContent = `موعد الاستلام: ${pickupDate} - ${pickupTime}`;
+                        pickupInfoDiv.classList.remove('hidden');
+                    });
+                    suppliesList.appendChild(itemDiv);
+                });
+            }
+            document.getElementById('request-supplies-btn')?.addEventListener('click', () => {
+                if (!selectedSupply) {
+                    showNotification('يرجى اختيار مستلزم واحد على الأقل.', 'error');
+                    return;
+                }
+                const pickupTime = document.getElementById('pickup-slot').textContent;
+                const newRequest = {
+                    id: `S-${Date.now()}`,
+                    type: 'supplies',
+                    title: `طلب استلام مستلزم: ${selectedSupply}`,
+                    details: `تم تقديم طلب استلام ${selectedSupply}.`,
+                    item: selectedSupply,
+                    date: new Date().toLocaleDateString('ar-LY'),
+                    status: 'قيد المراجعة',
+                    approvalSteps: ["المخازن"],
+                };
+                requests.push(newRequest);
+                showNotification('تم إرسال طلب المستلزمات بنجاح. سيتم مراجعة طلبك وتحديد موعد الاستلام.', 'success');
+                closeModal('suppliesModal');
+                setTimeout(() => {
+                    const updatedRequest = requests.find(req => req.id === newRequest.id);
+                    if (updatedRequest) {
+                         const today = new Date();
+                         today.setDate(today.getDate() + 1);
+                         const pickupDate = today.toLocaleDateString('ar-LY', { weekday: 'long', day: 'numeric', month: 'long' });
+                         const pickupTime = `10:00 صباحاً`;
+                        updatedRequest.status = 'تمت الموافقة';
+                        updatedRequest.pickupTime = `${pickupDate} - ${pickupTime}`;
+                        showPushNotification('تنبيه: طلب المستلزمات', `تمت الموافقة على طلبك لاستلام ${selectedSupply}، موعد الاستلام: ${pickupDate} - ${pickupTime}.`);
+                        loadStatusData();
+                    }
+                }, 10000);
+            });
+        });
+    </script>
+</body>
+</html>
+
